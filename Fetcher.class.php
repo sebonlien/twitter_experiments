@@ -93,7 +93,13 @@ class Fetcher
             $json = json_decode(curl_exec($ch));
             curl_close($ch);
             if ($json->errors != null) {
-                $this->error($json->errors[0]);
+                // If there was an error and no users have been fetched yet, it is a real error
+                if ($a == 0) {
+                    $this->error($json->errors[0]);
+                // Else we have a partial fetching and can output what we got before being stopped
+                } else {
+                    break;
+                }
             }
             foreach ($json->ids as $user) {
                 $this->followers[] = $user;
